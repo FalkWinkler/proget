@@ -2,14 +2,13 @@
 FROM microsoft/aspnet:4.7.1-windowsservercore-ltsc2016
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-VOLUME c:\packages
+VOLUME c:\ProgramData\proget
 
 ENV LicenseKey MH3JNEEF-E8J4-JHDBHY-J0G4PN-S292NECK
+ENV PROGET_VERSION 5.0.12
 
-#ENV FeedName testfalk
-#COPY ProGetSetup.exe ProGetSetup.exe
-#RUN Start-Process -FilePath (Join-Path $pwd ProGetSetup.exe) -ArgumentList '/S', '/Edition=LicenseKey', '/LicenseKey=MH3JNEEF-E8J4-JHDBHY-J0G4PN-S292NECK', '/TargetPath=c:\app' ,'/LogFile=c:\install.log' , '/InstallSqlExpress'  -NoNewWindow -Wait
-
+# download geht immer irgendwie nicht, ka warum. auf der REchner selber funktioniert das
+#RUN Invoke-WebRequest -Uri $('https://s3.amazonaws.com/cdn.inedo.com/downloads/proget/ProGetSetup{0}_Manual.zip' -f $env:PROGET_VERSION)  -UseBasicParsing -OutFile 'ProGetSetup.zip'
 COPY ProGetSetup.zip progetsetup.zip
 
 RUN MD /app
@@ -22,7 +21,6 @@ RUN Expand-Archive progetsetup.zip -DestinationPath C:\ ; `
 COPY Update-AppSetting.ps1 Update-AppSetting.ps1
 COPY Start.ps1 Start.ps1
 
-#RUN Start-Process -FilePath (Join-Path $pwd ProGetSetup.exe) -ArgumentList ('/S', '/Edition=LicenseKey', "/LicenseKey=$LicenseKey") -Wait -PassThru
 ENV PROGET_DATABASE "Server=proget-postgres; Database=postgres; User Id=postgres; Password=;"
 
 EXPOSE 80

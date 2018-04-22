@@ -16,7 +16,28 @@
     
     [xml]$doc = Get-Content -Path $config 
     $node = $doc.SelectSingleNode('//appSettings/add[@key="' + $key + '"]')
-    $node.SetAttribute('value', $value) > $null
+
+    if($node)
+    {
+        $node.SetAttribute('value', $value)    
+    }
+    else
+    {
+        $newElement = $doc.CreateElement("add");
+        $nameAtt1 = $doc.CreateAttribute("key")
+        $nameAtt1.psbase.value = $key;
+        $newElement.SetAttributeNode($nameAtt1);
+
+        $nameAtt2 = $doc.CreateAttribute("value");
+        $nameAtt2.psbase.value = $value;
+        $newElement.SetAttributeNode($nameAtt2);
+        
+        $appsettingsNode = $doc.SelectSingleNode('//appSettings')
+
+        $appsettingsNode.AppendChild($newElement);
+    }    
+
+
     $doc.Save($config)
 }
 
